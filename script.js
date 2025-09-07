@@ -1,3 +1,4 @@
+
 let form = document.querySelector("#agecalculator");
 let resultcontainer = document.querySelector(".result-container");
 
@@ -9,15 +10,14 @@ function agecalculator() {
     let birthmonth = arraybirthdate[1] - 1;
     let birthdates = arraybirthdate[2];
     let newbirthdate = new Date(birthyear, birthmonth, birthdates);
-    const todayMidnight = new Date(currentdate.getFullYear(), currentdate.getMonth(), currentdate.getDate());
-    let day = currentdate.getDate() - newbirthdate.getDate();
 
     if (newbirthdate > currentdate) {
         alert("Birth date cannot be in the future!");
         resultcontainer.style.display = "none";
+        return; // stop execution
     }
 
-    const ageinmillisecond = todayMidnight - newbirthdate;
+    const ageinmillisecond = currentdate - newbirthdate;
 
     const ageinsecond = Math.floor(ageinmillisecond / 1000);
     const ageinmintue = Math.floor(ageinsecond / 60);
@@ -27,30 +27,38 @@ function agecalculator() {
     const ageinmonth = Math.floor(ageindays / 30.436875);
     const ageinyear = Math.floor(ageindays / 365.25);
 
+    // Fix day calculation
+    let day = currentdate.getDate() - newbirthdate.getDate();
+    if (day < 0) {
+        day += new Date(currentdate.getFullYear(), currentdate.getMonth(), 0).getDate();
+    }
+    //In new Date(year, month, 0), the 0 means “the day before the 1st of the month”, which is the last day of the previous month.
+    //Month 8 = September 
+    //Day 0 → 1 day before 1st September = 31 August
+
     document.querySelector("#age").innerHTML = `${ageinyear} Age ${ageinmonth % 12} Months ${day} Days`;
 
     let months = document.querySelector("#mouths-passed");
-    months.innerHTML = ageinmonth + " " + "Months";
+    months.innerHTML = ageinmonth.toLocaleString() + " " + "Months";
 
     let week = document.querySelector("#weeks-passed");
-    week.innerHTML = ageinweek + " " + "Weeks";
+    week.innerHTML = ageinweek.toLocaleString() + " " + "Weeks";
 
     let days = document.querySelector("#days-passed");
-    days.innerHTML = ageindays + " " + "Days";
+    days.innerHTML = ageindays.toLocaleString() + " " + "Days";
 
     let hours = document.querySelector("#hours-passed");
-    hours.innerHTML = ageinhours + " " + "Hours";
+    hours.innerHTML = ageinhours.toLocaleString() + " " + "Hours";
 
     let mintues = document.querySelector("#minutes-passed");
-    mintues.innerHTML = ageinmintue + " " + "Mintues";
+    mintues.innerHTML = ageinmintue.toLocaleString() + " " + "Mintues";
 
     let seconds = document.querySelector("#seconds-passed");
-    seconds.innerHTML = ageinsecond + " " + "Seconds";
+    seconds.innerHTML = ageinsecond.toLocaleString() + " " + "Seconds";
 }
-
+//toLocaleString() automatically adds commas for large numbers.
 form.addEventListener("submit", function (dets) {
     dets.preventDefault(); // No refresh
     resultcontainer.style.display = "block";
     agecalculator();
-})
-
+});
